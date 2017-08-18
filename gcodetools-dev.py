@@ -4608,7 +4608,7 @@ class Gcodetools(inkex.Effect):
 
 		def get_tangent_knife_turn_gcode(s,si,tool,current_a, depth, penetration_feed) :
 			# assign letter to rotation A or C usually
-			letter4th = tool['4th axis letter']
+			letter4th = " "+tool['4th axis letter']
 			# get tangent at start point
 			forse = False
 			if current_a == None :
@@ -4623,11 +4623,11 @@ class Gcodetools(inkex.Effect):
 					a = atan2_(-s[2][1]+s[0][1],s[2][0]-s[0][0]) + pi
 			# calculate all vars
 			a = calculate_angle(a, current_a)
-			axis4 = " A%f"%((a+s[3])*tool['4th axis scale']+tool['4th axis offset']) if s[1]=="arc" else ""
+			axis4 = letter4th+"%f"%((a+s[3])*tool['4th axis scale']+tool['4th axis offset']) if s[1]=="arc" else ""
 			if not forse and ( abs((a-current_a)%pi2)<TURN_KNIFE_ANGLE_TOLERANCE or abs((a-current_a)%pi2 - pi2)<TURN_KNIFE_ANGLE_TOLERANCE ) :
 				g = ""
 			else :
-				g = "A%f  (Turn knife)\n" % (a*tool['4th axis scale']+tool['4th axis offset'])
+				g = letter4th+"%f  (Turn knife)\n" % (a*tool['4th axis scale']+tool['4th axis offset'])
 				if tool['lift knife at corner']!=0. :
 					g = "G00 Z%f  (Lift up)\n"%(depth+tool['lift knife at corner']) + "G00 "+ g + "G01 Z%f %s (Penetrate back)\n"%(depth,penetration_feed)
 				else :
@@ -6975,6 +6975,7 @@ class Gcodetools(inkex.Effect):
 					"penetration feed":"100",
 					"depth step":"100",
 					"4th axis meaning": "tangent knife",
+					"4th axis letter" : "C",
 					"4th axis scale": 1.,
 					"4th axis offset": 0,
 					"lift knife at corner": 0.,
