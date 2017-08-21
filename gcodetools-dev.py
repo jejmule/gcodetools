@@ -4633,8 +4633,11 @@ class Gcodetools(inkex.Effect):
 						lift_up = "G00 Z%f  (Lift up)\n"%(depth+tool['lift knife at corner'])
 						penetrate = "G01 Z%f %s (Penetrate back)\n"%(depth,penetration_feed)
 					if tool['Z axis type'] == 'pneumatic':
-						lift_up = tool['Z up code']+" (Up)"
-						penetrate = tool['Z down code']+" (Down)"
+						if forse :
+							lift_up = "" #tool already up
+						else :
+							lift_up = tool['Z up code']+" (Up)\n"
+						penetrate = tool['Z down code']+" (Down)\n"
 					g = lift_up+"G00 "+ g + penetrate
 				else :
 					g = "G01 "+g
@@ -4656,8 +4659,13 @@ class Gcodetools(inkex.Effect):
 				g += "S%s\n" % (tool["spindle rpm"])
 		lg, zs, f =  'G00', self.options.Zsafe, " F%f"%tool['feed']
 		current_a = None
-		go_to_safe_distance = "G00" + c([None,None,zs]) + "\n"
-		penetration_feed = " F%s"%tool['penetration feed']
+		if tool["Z axis type"] == "motorized" :
+			go_to_safe_distance = "G00" + c([None,None,zs]) + "\n"
+			penetration_feed = " F%s"%tool['penetration feed']
+		if tool["Z axis type"] == "pneumatic" :
+			go_to_safe_distance = tool["Z up code"]+" (Safe up)\n"
+			penetration_feed = ""
+
 		for i in range(1,len(curve)):
 		#	Creating Gcode for curve between s=curve[i-1] and si=curve[i] start at s[0] end at s[4]=si[0]
 			s, si = curve[i-1], curve[i]
@@ -4675,8 +4683,13 @@ class Gcodetools(inkex.Effect):
 				if tool['4th axis meaning'] == "tangent knife" :
 					current_a, axis4, g_ =  get_tangent_knife_turn_gcode(s,si,tool,current_a, depth, penetration_feed)
 					g+=g_
-				if lg=="G00": g += "G01" + c([None,None,s[5][0]+depth]) + penetration_feed +"(Penetrate)\n"
-				g += "G01" +c(si[0]+[s[5][1]+depth]) + feed + "\n"
+				if lg=="G00" and tool['Z axis type']=="motorized":
+					g += "G01" + c([None,None,s[5][0]+depth]) + penetration_feed +"(Penetrate)\n"
+				if tool['Z axis type']=="motorized":
+					target = si[0]+[s[5][1]+depth]
+				else :
+					target = si[0]
+				g += "G01" +c(target) + feed + "\n"
 				lg = 'G01'
 			elif s[1] == 'arc':
 				r = [(s[2][0]-s[0][0]), (s[2][1]-s[0][1])]
@@ -6981,8 +6994,11 @@ class Gcodetools(inkex.Effect):
 					"4th axis letter" : "C",
 					"4th axis scale": 1.,
 					"4th axis offset": 0,
-					"lift knife at corner": 0.,
-					"tool change gcode":" "
+					"lift knife at corner": 1.0,
+					"tool change gcode":" ",
+					"Z axis type" : "pneumatic",
+					"Z up code" : "M55 P1",
+					"Z down code" : "M54 P1"
 			}
 
 		elif self.options.tools_library_type == "plasma cutter":
