@@ -4698,20 +4698,29 @@ class Gcodetools(inkex.Effect):
 					g+=g_
 					current_a = current_a+s[3]
 				else : axis4 = ""
-				if lg=="G00": g += "G01" + c([None,None,s[5][0]+depth]) + penetration_feed + "(Penetrate)\n"
+				if lg=="G00" and tool['Z axis type']=="motorized":
+					 g += "G01" + c([None,None,s[5][0]+depth]) + penetration_feed + "(Penetrate)\n"
+				if tool['Z axis type']=="motorized":
+					targetIJK = si[0]+[ s[5][1]+depth, (s[2][0]-s[0][0]),(s[2][1]-s[0][1])]
+					target = si[0]+[ s[5][1]+depth ]
+				else:
+					targetIJK = si[0]+[s[5][1]+depth,(s[2][0]-s[0][0]),(s[2][1]-s[0][1])]
+					target = si[0]
+
 				if (r[0]**2 + r[1]**2)>self.options.min_arc_radius**2:
 					r1, r2 = (P(s[0])-P(s[2])), (P(si[0])-P(s[2]))
 					if abs(r1.mag()-r2.mag()) < 0.001 :
-						g += ("G02" if s[3]<0 else "G03") + c(si[0]+[ s[5][1]+depth, (s[2][0]-s[0][0]),(s[2][1]-s[0][1])  ]) + feed + axis4 + "\n"
+						g += ("G02" if s[3]<0 else "G03") + c(targetIJK) + feed + axis4 + "\n"
+						#c(si[0]+[ s[5][1]+depth, (s[2][0]-s[0][0]),(s[2][1]-s[0][1])  ])
 					else:
 						r = (r1.mag()+r2.mag())/2
-						g += ("G02" if s[3]<0 else "G03") + c(si[0]+[s[5][1]+depth]) + " R%f" % (r) + feed  + axis4 + "\n"
+						g += ("G02" if s[3]<0 else "G03") + c(target) + " R%f" % (r) + feed  + axis4 + "\n"
 					lg = 'G02'
 				else:
 					if tool['4th axis meaning'] == "tangent knife" :
 						current_a, axis4, g_ = get_tangent_knife_turn_gcode(s[:1]+["line"]+s[2:],si,tool,current_a, depth, penetration_feed)
 						g+=g_
-					g += "G01" +c(si[0]+[s[5][1]+depth]) + feed + "\n"
+					g += "G01" +c(target) + feed + "\n"
 					lg = 'G01'
 		if si[1] == 'end':
 			g += "(Subpath end)\n"
