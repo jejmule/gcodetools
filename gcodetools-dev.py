@@ -4296,11 +4296,11 @@ class Gcodetools(inkex.Effect):
 					"spindle rpm":"",
 					"CW or CCW":"",
 					"tool change gcode":" ",
-					"Z axis type":"motorized",
+					"Z axis type":"motorized", #pneumatic for CNC tangential cutter
 					"Z up code":"",
 					"Z down code":"",
 					"4th axis meaning": " ",
-					"4th axis letter" : " ",
+					"4th axis letter" : "A",
 					"4th axis scale": 1.,
 					"4th axis offset": 0.,
 					"lift knife at corner": 0.,
@@ -4629,13 +4629,16 @@ class Gcodetools(inkex.Effect):
 			else :
 				g = letter4th+"%f  (Turn knife)\n" % (a*tool['4th axis scale']+tool['4th axis offset'])
 				if tool['lift knife at corner']!=0. :
-					g = "G00 Z%f  (Lift up)\n"%(depth+tool['lift knife at corner']) + "G00 "+ g + "G01 Z%f %s (Penetrate back)\n"%(depth,penetration_feed)
+					if tool['Z axis type'] == 'motorized':
+						lift_up = "G00 Z%f  (Lift up)\n"%(depth+tool['lift knife at corner'])
+						penetrate = "G01 Z%f %s (Penetrate back)\n"%(depth,penetration_feed)
+					if tool['Z axis type'] == 'pneumatic':
+						lift_up = tool['Z up code']+" (Up)"
+						penetrate = tool['Z down code']+" (Down)"
+					g = lift_up+"G00 "+ g + penetrate
 				else :
 					g = "G01 "+g
 			return a, axis4, g
-
-
-
 
 		if len(curve)==0 : return ""
 
