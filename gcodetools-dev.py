@@ -220,7 +220,8 @@ straight_distance_tolerance = 0.0001
 engraving_tolerance = 0.00001
 loft_lengths_tolerance = 0.0000001
 
-TURN_KNIFE_ANGLE_TOLERANCE = 1e-3 # in radians - tolerance on which we should get tangetn knife up tu turn it
+#TURN_KNIFE_ANGLE_TOLERANCE = 1e-3 # in radians - tolerance on which we should get tangetn knife up tu turn it
+TURN_KNIFE_ANGLE_TOLERANCE = 0.15  # in radians - tolerance on which we should get tangetn knife up tu turn it
 
 EMC_TOLERANCE_EQUAL = 0.00001
 
@@ -4622,10 +4623,11 @@ class Gcodetools(inkex.Effect):
 				else: #CCW
 					a = atan2_(-s[2][1]+s[0][1],s[2][0]-s[0][0]) + pi
 			# calculate all vars
-			a = calculate_angle(a, current_a)
-			axis4 = letter4th+"%f"%((a+s[3])*tool['4th axis scale']+tool['4th axis offset']) if s[1]=="arc" else ""
-			if not forse and ( abs((a-current_a)%pi2)<TURN_KNIFE_ANGLE_TOLERANCE or abs((a-current_a)%pi2 - pi2)<TURN_KNIFE_ANGLE_TOLERANCE ) :
-				g = ""
+			a = calculate_angle(a, current_a) % pi2
+			axis4 = letter4th+"%f"%(((a+s[3]))*tool['4th axis scale']+tool['4th axis offset']) if s[1]=="arc" else ""
+			#if not forse and ( abs((a-current_a)%pi2)<TURN_KNIFE_ANGLE_TOLERANCE or abs((a-current_a)%pi2 - pi2)<TURN_KNIFE_ANGLE_TOLERANCE ) :
+			if not forse and ( abs((a-current_a))<TURN_KNIFE_ANGLE_TOLERANCE ) :
+				g = "(no_corner%f)"%((a-current_a)*tool['4th axis scale']+tool['4th axis offset'])
 			else :
 				g = letter4th+"%f  (Turn knife)\n" % (a*tool['4th axis scale']+tool['4th axis offset'])
 				if tool['lift knife at corner']!=0. :
@@ -4638,7 +4640,7 @@ class Gcodetools(inkex.Effect):
 						else :
 							lift_up = tool['Z up code']+" (Up)\n"
 						penetrate = tool['Z down code']+" (Down)\n"
-					g = lift_up+"G00 "+ g + penetrate
+					g = "(turn@corner:%f)"%((a-current_a)*tool['4th axis scale']+tool['4th axis offset'])+lift_up+"G00 "+ g + penetrate
 				else :
 					g = "G01 "+g
 			return a, axis4, g
@@ -4701,26 +4703,24 @@ class Gcodetools(inkex.Effect):
 				if lg=="G00" and tool['Z axis type']=="motorized":
 					 g += "G01" + c([None,None,s[5][0]+depth]) + penetration_feed + "(Penetrate)\n"
 				if tool['Z axis type']=="motorized":
-					targetIJK = si[0]+[ s[5][1]+depth, (s[2][0]-s[0][0]),(s[2][1]-s[0][1])]
-					target = si[0]+[ s[5][1]+depth ]
+					targetZ = s[5][1]+depth
 				else:
-					targetIJK = si[0]+[s[5][1]+depth,(s[2][0]-s[0][0]),(s[2][1]-s[0][1])]
-					target = si[0]
+					targetZ = None
 
 				if (r[0]**2 + r[1]**2)>self.options.min_arc_radius**2:
 					r1, r2 = (P(s[0])-P(s[2])), (P(si[0])-P(s[2]))
 					if abs(r1.mag()-r2.mag()) < 0.001 :
-						g += ("G02" if s[3]<0 else "G03") + c(targetIJK) + feed + axis4 + "\n"
+						g += ("G02" if s[3]<0 else "G03") + c(si[0]+[targetZ, (s[2][0]-s[0][0]),(s[2][1]-s[0][1])]) + feed + axis4 + "\n"
 						#c(si[0]+[ s[5][1]+depth, (s[2][0]-s[0][0]),(s[2][1]-s[0][1])  ])
 					else:
 						r = (r1.mag()+r2.mag())/2
-						g += ("G02" if s[3]<0 else "G03") + c(target) + " R%f" % (r) + feed  + axis4 + "\n"
+						g += ("G02" if s[3]<0 else "G03") + c(si[0]+[targetZ]) + " R%f" % (r) + feed  + axis4 + "\n"
 					lg = 'G02'
 				else:
 					if tool['4th axis meaning'] == "tangent knife" :
 						current_a, axis4, g_ = get_tangent_knife_turn_gcode(s[:1]+["line"]+s[2:],si,tool,current_a, depth, penetration_feed)
 						g+=g_
-					g += "G01" +c(target) + feed + "\n"
+					g += "G01" +c(si[0]+[targetZ]) + feed + "\n"
 					lg = 'G01'
 		if si[1] == 'end':
 			g += "(Subpath end)\n"
