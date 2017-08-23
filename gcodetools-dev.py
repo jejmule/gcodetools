@@ -221,7 +221,7 @@ engraving_tolerance = 0.00001
 loft_lengths_tolerance = 0.0000001
 
 #TURN_KNIFE_ANGLE_TOLERANCE = 1e-3 # in radians - tolerance on which we should get tangetn knife up tu turn it
-TURN_KNIFE_ANGLE_TOLERANCE = 0.15  # in radians - tolerance on which we should get tangetn knife up tu turn it
+TURN_KNIFE_ANGLE_TOLERANCE = 5*pi/180  # 3.0° in radians - tolerance on which we should get tangetn knife up tu turn it
 
 EMC_TOLERANCE_EQUAL = 0.00001
 
@@ -4623,11 +4623,11 @@ class Gcodetools(inkex.Effect):
 				else: #CCW
 					a = atan2_(-s[2][1]+s[0][1],s[2][0]-s[0][0]) + pi
 			# calculate all vars
-			a = calculate_angle(a, current_a) % pi2
+			a = calculate_angle(a, current_a)
 			axis4 = letter4th+"%f"%(((a+s[3]))*tool['4th axis scale']+tool['4th axis offset']) if s[1]=="arc" else ""
 			#if not forse and ( abs((a-current_a)%pi2)<TURN_KNIFE_ANGLE_TOLERANCE or abs((a-current_a)%pi2 - pi2)<TURN_KNIFE_ANGLE_TOLERANCE ) :
 			if not forse and ( abs((a-current_a))<TURN_KNIFE_ANGLE_TOLERANCE ) :
-				g = "(no_corner%f)"%((a-current_a)*tool['4th axis scale']+tool['4th axis offset'])
+				g = ""
 			else :
 				g = letter4th+"%f  (Turn knife)\n" % (a*tool['4th axis scale']+tool['4th axis offset'])
 				if tool['lift knife at corner']!=0. :
@@ -4640,7 +4640,7 @@ class Gcodetools(inkex.Effect):
 						else :
 							lift_up = tool['Z up code']+" (Up)\n"
 						penetrate = tool['Z down code']+" (Down)\n"
-					g = "(turn@corner:%f)"%((a-current_a)*tool['4th axis scale']+tool['4th axis offset'])+lift_up+"G00 "+ g + penetrate
+					g = lift_up+"G00 "+ g + penetrate
 				else :
 					g = "G01 "+g
 			return a, axis4, g
