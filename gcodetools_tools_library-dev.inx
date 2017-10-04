@@ -10,14 +10,9 @@
 		<page name='tools_library' _gui-text='Tools library'>	
 			
 			<param type='optiongroup' name='tools-library-type' _gui-text="Tools type:">
-<_option value='default tool'>default</_option>
-<_option value='cylinder cutter'>cylinder</_option>
-<_option value='cone cutter'>cone</_option>
-<_option value='plasma cutter'>plasma</_option>
-<_option value='tangent knife'>tangent knife</_option>
-<_option value='lathe cutter'>lathe cutter</_option>
-<_option value='graffiti'>graffiti</_option>
-
+<_option value='tangential tool 1'>Tangent tool 1 : knife or wheel</_option>
+<_option value='tangential tool 2'>Tangent tool 2 : knife or wheel</_option>
+<_option value='drag tool 3'>drag tool 3 : pen</_option>
 
 <_option value='check'>Just check tools</_option>
 
@@ -54,7 +49,7 @@ Gcodetools ver. 1.6
 	</param>	
     <effect>
 		<effects-menu>
-			<submenu _name="Gcodetools-dev"/>
+			<submenu _name="CNC Cutter"/>
 		</effects-menu>
 		<object-type>path</object-type>
     </effect>

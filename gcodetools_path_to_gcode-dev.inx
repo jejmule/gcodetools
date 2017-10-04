@@ -91,7 +91,7 @@ Gcodetools ver. 1.6
 	</param>	
     <effect>
 		<effects-menu>
-			<submenu _name="Gcodetools-dev"/>
+			<submenu _name="CNC Cutter"/>
 		</effects-menu>
 		<object-type>path</object-type>
     </effect>
