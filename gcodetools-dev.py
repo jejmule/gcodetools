@@ -4685,12 +4685,21 @@ class Gcodetools(inkex.Effect):
 				if tool['4th axis meaning'] == "tangent knife" :
 					current_a, axis4, g_ =  get_tangent_knife_turn_gcode(s,si,tool,current_a, depth, penetration_feed)
 					g+=g_
+				if tool['Z axis type']=="motorized":
+					target = si[0]+[s[5][1]+depth]
+					if lg =="G00":
+						g += "G01" + c([None,None,s[5][0]+depth]) + penetration_feed +"(Penetrate)\n"
+				if tool['Z axis type']=="pneumatic":
+					target = si[0]
+					if lg =="G00":
+						g += tool['Z down code']+"\n"
+				"""
 				if lg=="G00" and tool['Z axis type']=="motorized":
 					g += "G01" + c([None,None,s[5][0]+depth]) + penetration_feed +"(Penetrate)\n"
 				if tool['Z axis type']=="motorized":
 					target = si[0]+[s[5][1]+depth]
 				else :
-					target = si[0]
+					target = si[0]"""
 				g += "G01" +c(target) + feed + "\n"
 				lg = 'G01'
 			elif s[1] == 'arc':
@@ -4700,12 +4709,20 @@ class Gcodetools(inkex.Effect):
 					g+=g_
 					current_a = current_a+s[3]
 				else : axis4 = ""
-				if lg=="G00" and tool['Z axis type']=="motorized":
+				targetZ = None
+				if tool['Z axis type']=="motorized":
+					targetZ = s[5][1]+depth
+					if lg=="G00":
+						g += "G01" + c([None,None,s[5][0]+depth]) + penetration_feed + "(Penetrate)\n"
+				if tool['Z axis type']=="pneumatic":
+					if lg=="G00":
+						g += tool['Z down code']+"\n"
+				"""if lg=="G00" and tool['Z axis type']=="motorized":
 					 g += "G01" + c([None,None,s[5][0]+depth]) + penetration_feed + "(Penetrate)\n"
 				if tool['Z axis type']=="motorized":
 					targetZ = s[5][1]+depth
 				else:
-					targetZ = None
+					targetZ = None"""
 
 				if (r[0]**2 + r[1]**2)>self.options.min_arc_radius**2:
 					r1, r2 = (P(s[0])-P(s[2])), (P(si[0])-P(s[2]))
@@ -6993,11 +7010,6 @@ class Gcodetools(inkex.Effect):
 					"id": "Drag tool 3",
 					"feed":"5000",
 					"tool change gcode":"M95",
-					"4th axis meaning": "tangent knife",
-					"4th axis letter" : "C",
-					"4th axis scale": 180./pi,
-					"4th axis offset": 0,
-					"lift knife at corner": 1.0,
 					"Z axis type" : "pneumatic",
 					"Z up code" : "M55 P4\nG4 P0.2",
 					"Z down code" : "M54 P4\nG4 P0.2"
