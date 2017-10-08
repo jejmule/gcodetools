@@ -238,7 +238,7 @@ G4 P5
 'footer': """
 (Footer)
 M90 P1
-G00 X2000.0000 Y1000.0000
+G30
 (Using default footer. To add your own footer create file "footer" in the output dir.)
 (end)
 """
@@ -6967,10 +6967,10 @@ class Gcodetools(inkex.Effect):
 					"4th axis scale": 180./pi,
 					"4th axis offset": 0,
 					"lift knife at corner": 1.0,
-					"tool change gcode":"M91 P1",
+					"tool change gcode":"M91",
 					"Z axis type" : "pneumatic",
-					"Z up code" : "M55 P2\nG4 P1",
-					"Z down code" : "M54 P2\nG4 P0.5"
+					"Z up code" : "M55 P2\nG4 P0.2",
+					"Z down code" : "M54 P2\nG4 P0.2"
 			}
 		elif self.options.tools_library_type == "tangential tool 2":
 			tool = {
@@ -6980,22 +6980,27 @@ class Gcodetools(inkex.Effect):
 					"4th axis meaning": "tangent knife",
 					"4th axis letter" : "C",
 					"4th axis scale": 180./pi,
-					"4th axis offset": 0,
+					"4th axis offset": -55,
 					"lift knife at corner": 1.0,
-					"tool change gcode":"M92 P1",
+					"tool change gcode":"M92",
 					"Z axis type" : "pneumatic",
-					"Z up code" : "M55 P3\nG4 P1",
-					"Z down code" : "M54 P3\nG4 P0.5"
+					"Z up code" : "M55 P3\nG4 P0.2",
+					"Z down code" : "M54 P3\nG4 P0.2"
 			}
 		elif self.options.tools_library_type == "drag tool 3":
 			tool = {
 					"name": "Drag tool 3",
 					"id": "Drag tool 3",
 					"feed":"5000",
-					"tool change gcode":"M95 P1",
+					"tool change gcode":"M95",
+					"4th axis meaning": "tangent knife",
+					"4th axis letter" : "C",
+					"4th axis scale": 180./pi,
+					"4th axis offset": 0,
+					"lift knife at corner": 1.0,
 					"Z axis type" : "pneumatic",
-					"Z up code" : "M55 P4\nG4 P1",
-					"Z down code" : "M54 P4\nG4 P0.5"
+					"Z up code" : "M55 P4\nG4 P0.2",
+					"Z down code" : "M54 P4\nG4 P0.2"
 			}
 		else :
 			tool = self.default_tool
