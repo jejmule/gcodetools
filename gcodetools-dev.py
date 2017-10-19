@@ -6982,7 +6982,7 @@ class Gcodetools(inkex.Effect):
 			tool = {
 					"name": "Tangential tool 1",
 					"id": "Tangent tool 1",
-					"feed":"2500",
+					"feed":"5000",
 					"4th axis meaning": "tangent knife",
 					"4th axis letter" : "C",
 					"4th axis scale": 180./pi,
@@ -6997,7 +6997,7 @@ class Gcodetools(inkex.Effect):
 			tool = {
 					"name": "Tangential tool 2",
 					"id": "Tangent tool 2",
-					"feed":"2500",
+					"feed":"5000",
 					"4th axis meaning": "tangent knife",
 					"4th axis letter" : "C",
 					"4th axis scale": 180./pi,
