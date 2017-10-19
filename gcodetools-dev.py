@@ -7036,16 +7036,17 @@ class Gcodetools(inkex.Effect):
 			if key not in keys: keys += [key]
 		for key in keys :
 			g = inkex.etree.SubElement(tools_group, inkex.addNS('g','svg'), {'gcodetools': "Gcodetools tool parameter"})
-			self.draw_text(key, 0, y, group = g, gcodetools_tag = "Gcodetools tool definition field name", font_size = 80 if key!='name' else 100)
+			self.draw_text(key, 0, y, group = g, gcodetools_tag = "Gcodetools tool definition field name", font_size = 50 if key!='name' else 60)
 			param = tool[key]
 			if type(param)==str and re.match("^\s*$",param) : param = "(None)"
-			self.draw_text(param, 300, y, group = g, gcodetools_tag = "Gcodetools tool definition field value", font_size = 80 if key!='name' else 100)
+			self.draw_text(param, 200, y, group = g, gcodetools_tag = "Gcodetools tool definition field value", font_size = 50 if key!='name' else 60)
 			v = str(param).split("\n")
-			y += 50*len(v) if key!='name' else 50*len(v)
+			y += 20*len(v) if key!='name' else 30*len(v)
 
-		bg.set('d',"m -20,-20 l 600,0 0,%f -600,0 z " % (y+50))
+		bg.set('d',"m -20,-25 l 400,0 0,%f -400,0 z " % (y+20))
 		tool = []
-		tools_group.set("transform", simpletransform.formatTransform([ [1,0,self.view_center[0]-300 ], [0,1,self.view_center[1]] ] ))
+		#tools_group.set("transform", simpletransform.formatTransform([ [1,0,self.view_center[0]-300 ], [0,1,self.view_center[1]] ] ))
+		tools_group.set("transform", simpletransform.formatTransform([ [1,0,-500 ], [0,1,10] ]))
 
 
 ################################################################################
