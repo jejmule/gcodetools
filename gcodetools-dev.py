@@ -3597,7 +3597,7 @@ class Gcodetools(inkex.Effect):
 			x,y = gcodetools.transform([x,y], layer, True)
 		if style == None :
 			style = "font-family:DejaVu Sans;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:DejaVu Sans;fill:#000000;fill-opacity:1;stroke:none;"
-		style += "font-size:%f;"%(self.utouu(str(font_size)+"px"))
+		#style += "font-size:%f;"%(self.utouu(str(font_size)+"px")) #JPA removed for Ai importation
 		attributes = {			'x':	str(x),
 								inkex.addNS("space","xml"):"preserve",
 								'y':	str(y),
