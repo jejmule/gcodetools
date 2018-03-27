@@ -239,6 +239,7 @@ G4 P2 (wait 2s)
 (Footer)
 M90 (select tool 0)
 G30 (go to corner)
+M55 P1 (turn off vaccum)
 (Using default footer. To add your own footer create file "footer" in the output dir.)
 (end)
 """
