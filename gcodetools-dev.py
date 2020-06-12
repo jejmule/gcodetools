@@ -4705,6 +4705,7 @@ class Gcodetools(inkex.Effect):
 				else :
 					target = si[0]"""
 				##gg is added when angle is lower than tolerance
+				#The knife is rotated while moving into the material ! to avoid it G01 gg \n G01 c(targeget)
 				g += "G01" +c(target) + gg + feed + "\n"
 				lg = 'G01'
 			elif s[1] == 'arc':
