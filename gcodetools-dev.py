@@ -101,7 +101,9 @@ def generate_gcodetools_point(xc, yc,layer):
     attribs = {'d': path, inkex.addNS('dxfpoint','inkscape'):'1', 'style': 'stroke:#ff0000;fill:#ff0000'}
     inkex.etree.SubElement(layer, 'path', attribs)
 
-def bezierslopeatt(((bx0,by0),(bx1,by1),(bx2,by2),(bx3,by3)),t):
+#def bezierslopeatt(((bx0,by0),(bx1,by1),(bx2,by2),(bx3,by3)),t):
+def bezierslopeatt(param,t):
+	((bx0,by0),(bx1,by1),(bx2,by2),(bx3,by3)) = param
 	ax,ay,bx,by,cx,cy,x0,y0=bezmisc.bezierparameterize(((bx0,by0),(bx1,by1),(bx2,by2),(bx3,by3)))
 	dx=3*ax*(t**2)+2*bx*t+cx
 	dy=3*ay*(t**2)+2*by*t+cy
@@ -1443,7 +1445,7 @@ def csp_segment_convex_hull(sp1,sp2):
 	if not (m1 and m2) and m3 : return [c,a,d]
 	if not (m1 and m3) and m2 : return [b,c,d]
 
-	raise ValueError, "csp_segment_convex_hull happend something that shouldnot happen!"
+	raise ValueError("csp_segment_convex_hull happend something that shouldnot happen!")
 
 
 ################################################################################
@@ -1467,7 +1469,8 @@ def bounds_intersect(a, b) :
 	return not ( (a[0]>b[2]) or (b[0]>a[2]) or (a[1]>b[3]) or (b[1]>a[3]) )
 
 
-def tpoint((x1,y1),(x2,y2),t):
+def tpoint(param,t):
+	(x1,y1),(x2,y2) = param
 	return [x1+t*(x2-x1),y1+t*(y2-y1)]
 
 
@@ -1501,7 +1504,8 @@ def bez_normalized_slope(bez,t):
 ###	Some vector functions
 ################################################################################
 
-def normalize((x,y)) :
+def normalize(param) :
+	(x,y) = param
 	l = sqrt(x**2+y**2)
 	if l == 0 : return [0.,0.]
 	else : 		return [x/l, y/l]
@@ -1591,7 +1595,7 @@ def atan2_(*arg):
 	elif len(arg)==2 :
 		return (pi/2 - atan2(arg[0],arg[1]) ) % pi2
 	else :
-		raise ValueError, "Bad argumets for atan! (%s)" % arg
+		raise ValueError("Bad argumets for atan! (%s)" % arg)
 
 def get_text(node) :
 	value = None
@@ -2633,11 +2637,11 @@ def biarc(sp1, sp2, z1, z2, depth=0):
 	elif 	csmall and a!=0:	beta = -b/a
 	elif not asmall:
 		discr = b*b-4*a*c
-		if discr < 0:	raise ValueError, (a,b,c,discr)
+		if discr < 0:	raise ValueError((a,b,c,discr))
 		disq = discr**.5
 		beta1 = (-b - disq) / 2 / a
 		beta2 = (-b + disq) / 2 / a
-		if beta1*beta2 > 0 :	raise ValueError, (a,b,c,disq,beta1,beta2)
+		if beta1*beta2 > 0 :	raise ValueError((a,b,c,disq,beta1,beta2))
 		beta = max(beta1, beta2)
 	elif	asmall and bsmall:
 		return biarc_split(sp1, sp2, z1, z2, depth)
@@ -3328,7 +3332,7 @@ class Polygon:
 
 		while len(edges)>0 :
 			poly = []
-			if loops > len_edges  : raise ValueError, "Hull error"
+			if loops > len_edges  : raise ValueError("Hull error")
 			loops+=1
 			# Find left most vertex.
 			start = (1e100,1)
@@ -3339,7 +3343,7 @@ class Polygon:
 			loops1 = 0
 			while (last[1]!=start[0] or first_run) :
 				first_run = False
-				if loops1 > len_edges  : raise ValueError, "Hull error"
+				if loops1 > len_edges  : raise ValueError("Hull error")
 				loops1 += 1
 				next = get_closes_edge_by_angle(edges[last[1]],last)
 				#draw_pointer(next[0]+next[1],"Green","line", comment=i, width= 1)
@@ -4673,6 +4677,7 @@ class Gcodetools(inkex.Effect):
 			penetration_feed = ""
 
 		for i in range(1,len(curve)):
+			gg =""
 		#	Creating Gcode for curve between s=curve[i-1] and si=curve[i] start at s[0] end at s[4]=si[0]
 			s, si = curve[i-1], curve[i]
 			if s[1] in ["line","arc"] and point_to_point_d2(s[0],si[0]) < 1e-7 : continue
@@ -4696,6 +4701,7 @@ class Gcodetools(inkex.Effect):
 				if tool['Z axis type']=="pneumatic":
 					target = si[0]
 					if lg =="G00" and tool['4th axis meaning'] != "tangent knife":
+					#if lg =="G00" and tool['4th axis meaning'] != "tangent knife":
 						g += tool['Z down code']+"\n"
 				"""
 				if lg=="G00" and tool['Z axis type']=="motorized":
@@ -5163,10 +5169,10 @@ class Gcodetools(inkex.Effect):
 				#print_("Found tool parameter '%s':'%s'" % (key,value))
 				if key in self.default_tool.keys() :
 					 try :
-						tool[key] = type(self.default_tool[key])(value)
+						 tool[key] = type(self.default_tool[key])(value)
 					 except :
-						tool[key] = self.default_tool[key]
-						self.error(_("Warning! Tool's and default tool's parameter's (%s) types are not the same ( type('%s') != type('%s') ).") % (key, value, self.default_tool[key]), "tools_warning")
+						 tool[key] = self.default_tool[key]
+						 self.error(_("Warning! Tool's and default tool's parameter's (%s) types are not the same ( type('%s') != type('%s') ).") % (key, value, self.default_tool[key]), "tools_warning")
 				else :
 					tool[key] = value
 					self.error(_("Warning! Tool has parameter that default tool has not ( '%s': '%s' ).") % (key, value), "tools_warning" )
@@ -5940,11 +5946,11 @@ class Gcodetools(inkex.Effect):
 			elif 	csmall and a!=0:	beta = -b/a
 			elif not asmall:
 				discr = b*b-4*a*c
-				if discr < 0:	raise ValueError, (a,b,c,discr)
+				if discr < 0:	raise ValueError((a,b,c,discr))
 				disq = discr**.5
 				beta1 = (-b - disq) / 2 / a
 				beta2 = (-b + disq) / 2 / a
-				if beta1*beta2 > 0 :	raise ValueError, (a,b,c,disq,beta1,beta2)
+				if beta1*beta2 > 0 :	raise ValueError((a,b,c,disq,beta1,beta2))
 				beta = max(beta1, beta2)
 			elif	asmall and bsmall:
 				return biarc_split(sp1, sp2, z1, z2, depth)
@@ -6235,7 +6241,8 @@ class Gcodetools(inkex.Effect):
 		eye_dist = 100 #3D constant. Try varying it for your eyes
 
 
-		def bisect((nx1,ny1),(nx2,ny2)) :
+		def bisect(param) :
+			(nx1,ny1),(nx2,ny2) = param
 			"""LT Find angle bisecting the normals n1 and n2
 
 			Parameters: Normalised normals
@@ -6265,7 +6272,8 @@ class Gcodetools(inkex.Effect):
 			return (cosBis/costurn,sinBis/costurn, sinturn)
 			#end bisect
 
-		def get_radius_to_line((x1,y1),(nx1,ny1), (nx2,ny2),(x2,y2),(nx23,ny23),(x3,y3),(nx3,ny3)):
+		def get_radius_to_line(param):
+			(x1,y1),(nx1,ny1), (nx2,ny2),(x2,y2),(nx23,ny23),(x3,y3),(nx3,ny3) = param
 			"""LT find biggest circle we can engrave here, if constrained by line 2-3
 
 			Parameters:
@@ -6325,7 +6333,8 @@ class Gcodetools(inkex.Effect):
 			return min(r, max_dist)
 			#end of get_radius_to_line
 
-		def get_radius_to_point((x1,y1),(nx,ny), (x2,y2)):
+		def get_radius_to_point(param):
+			(x1,y1),(nx,ny), (x2,y2) = param
 			"""LT find biggest circle we can engrave here, constrained by point x2,y2
 
 			This function can be used in three ways:
@@ -6402,7 +6411,8 @@ class Gcodetools(inkex.Effect):
 			return bez_divide(a,[abx,aby],[abcx,abcy],m) + bez_divide(m,[bcdx,bcdy],[cdx,cdy],d)
 			#end of bez_divide
 
-		def get_biggest((x1,y1),(nx,ny)):
+		def get_biggest(param):
+			(x1,y1),(nx,ny) = param
 			"""LT Find biggest circle we can draw inside path at point x1,y1 normal nx,ny
 
 			Parameters:
@@ -6460,7 +6470,10 @@ class Gcodetools(inkex.Effect):
 			return (jjmin,iimin,r)
 			#end of get_biggest
 
-		def line_divide((x0,y0),j0,i0,(x1,y1),j1,i1,(nx,ny),length):
+		def line_divide(p0,j0,i0,p1,j1,i1,p2,length):
+			(x0,y0) = p0
+			(x1,y1) = p1
+			(nx,ny) = p2
 			"""LT recursively divide a line as much as necessary
 
 			NOTE: This function is not currently used
@@ -6487,7 +6500,8 @@ class Gcodetools(inkex.Effect):
 			return [ line_divide((x0,y0),j0,i0,(x2,y2),j2,i2,(nx,ny),length/2), line_divide((x2,y2),j2,i2,(x1,y1),j1,i1,(nx,ny),length/2)]
 			#end of line_divide()
 
-		def save_point((x,y),w,i,j,ii,jj):
+		def save_point(XY,w,i,j,ii,jj):
+			(x,y) = XY
 			"""LT Save this point and delete previous one if linear
 
 			The point is, we generate tons of points but many may be in a straight 3D line.
@@ -6520,7 +6534,9 @@ class Gcodetools(inkex.Effect):
 			wl+=[w]
 			#end of save_point
 
-		def draw_point((x0,y0),(x,y),w,t):
+		def draw_point(p0,p,w,t):
+			(x0,y0) = p0
+			(x,y) = p
 			"""LT Draw this point as a circle with a 1px dot in the middle (x,y)
 			and a 3D line from (x0,y0) down to x,y. 3D line thickness should be t/2
 
@@ -7003,7 +7019,7 @@ class Gcodetools(inkex.Effect):
 					"4th axis meaning": "tangent knife",
 					"4th axis letter" : "C",
 					"4th axis scale": 180./pi,
-					"4th axis offset": -55,
+					"4th axis offset": -53,
 					"lift knife at corner": 1.0,
 					"tool change gcode":"M92",
 					"Z axis type" : "pneumatic",
@@ -7474,7 +7490,7 @@ class Gcodetools(inkex.Effect):
 			time_ = l/feed
 			c1,c2 = self.graffiti_reference_points[layer][0][0],self.graffiti_reference_points[layer][1][0]
 			d = sqrt( (c1[0]-c2[0])**2 + (c1[1]-c2[1])**2 )
-			if d == 0 : raise ValueError, "Error! Reference points should not be the same!"
+			if d == 0 : raise ValueError("Error! Reference points should not be the same!")
 			for i in range(int(time_*emmit+1)) :
 				t = i/(time_*emmit)
 				r1,r2 = start[0]*(1-t) + end[0]*t, start[1]*(1-t) + end[1]*t
