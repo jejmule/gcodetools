@@ -4686,6 +4686,7 @@ class Gcodetools(inkex.Effect):
 				g += go_to_safe_distance + tool['gcode after path'] + "\n"
 				lg = 'G00'
 			elif s[1] == 'line':
+				gg = ""
 				if tool['4th axis meaning'] == "tangent knife" :
 					current_a, axis4, g_, gg =  get_tangent_knife_turn_gcode(s,si,tool,current_a, depth, penetration_feed)
 					g+=g_
@@ -7003,7 +7004,7 @@ class Gcodetools(inkex.Effect):
 					"4th axis meaning": "tangent knife",
 					"4th axis letter" : "C",
 					"4th axis scale": 180./pi,
-					"4th axis offset": -55,
+					"4th axis offset": -53,
 					"lift knife at corner": 1.0,
 					"tool change gcode":"M92",
 					"Z axis type" : "pneumatic",
