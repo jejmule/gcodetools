@@ -64,7 +64,7 @@ class CSP() :
 	def __init__(self, csp=[], clean = True ) :
 		
 		self.items = []
-		if type(csp) == type([]) : 
+		if isinstance(csp, list) :
 			self.from_list(csp)
 		else :
 			self.from_el(csp)
