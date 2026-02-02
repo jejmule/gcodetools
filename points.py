@@ -20,6 +20,7 @@ class P:
 		return P(self.x * other, self.y * other)
 	__rmul__ = __mul__
 	def __div__(self, other): return P(self.x / other, self.y / other)
+	__truediv__ = __div__
 	def mag(self): return hypot(self.x, self.y)
 	def unit(self):
 		h = self.mag()

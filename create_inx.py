@@ -4,16 +4,16 @@ import xml.dom.minidom
 import getopt, sys, os, re, copy
 
 def usage():
-	print "Usage is not ready yet." # TODO
+	print("Usage is not ready yet.") # TODO
 
 
 def main():
 
 	try:
 		opts, args = getopt.getopt(sys.argv[1:], "hi:", ["help", "input=" ])
-	except getopt.GetoptError, err:
-		# print help information and exit:
-		print str(err) # will print something like "option -a not recognized"
+	except getopt.GetoptError as err:
+		# print(help information and exit:)
+		print(str(err)) # will print something like "option -a not recognized"
 		usage()
 		sys.exit(2)
 	input_file = None
@@ -58,9 +58,9 @@ def main():
 		tags['header'] = re.sub("\-dev\.py", ".py",tags['header']) 
 		tags['footer'] = re.sub("\-dev\.py", ".py",tags['footer']) 
 
-	print (dev)
+	print((dev))
 	for arg_ in args:
-		print "Computing set: %s..." % arg_
+		print("Computing set: %s..." % arg_)
 		r = re.match("((.*):)?(.*)",arg_)
 		if r!=None:
 			arg = r.group(3).split()
@@ -73,7 +73,7 @@ def main():
 
 			for i in arg:
 				if i not in tags and not re.match("no_",i): 
-					print "Can not find tag %s. Ignoring this set %s!\n" % (i,arg_)
+					print("Can not find tag %s. Ignoring this set %s!\n" % (i,arg_))
 					break
 				if not re.match("no_",i): res += tags[i]
 			if 'options' not in arg and 'no_options' not in arg: res += tags['options']
@@ -89,16 +89,16 @@ def main():
 			f = open("gcodetools_%s.inx"% ( re.sub("\s|[\.,!@#$%^&*]", "_", name.lower())) ,"w")
 			f.write(res)
 			f.close()
-			print "Done\n"
+			print("Done\n")
 					
 		"""		
 		arg = arg_.split()
 		for i in arg:
 			if i not in tags : 
-				print "Can not find tag %s. Ignoring this set %s." % (i,arg_)
+				print("Can not find tag %s. Ignoring this set %s." % (i,arg_))
 				break
 		if i not in tags : continue		
-		print i
+		print(i)
 		f=open("./gcodetools_"+"_".join(["%s" % k for k in arg])+".inx"	,"w")		
 		inx = copy.deepcopy(root)
 		tags = {}
